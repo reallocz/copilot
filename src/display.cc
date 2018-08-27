@@ -9,6 +9,7 @@ Display::Display(unsigned int width, unsigned int height)
     width_  = width;
     height_ = height;
     title_  = PDEF_TITLE;
+    deck_   = nullptr;
 }
 
 Display::~Display()
@@ -16,6 +17,12 @@ Display::~Display()
     SDL_DestroyRenderer(sdl_renderer_);
     SDL_DestroyWindow(sdl_window_);
     SDL_Quit();
+}
+
+
+void Display::SetDeck(Deck* deck)
+{
+    deck_ = deck;
 }
 
 void Display::Start()
@@ -54,7 +61,16 @@ void Display::Update()
     SDL_SetRenderDrawColor(sdl_renderer_, 210, 0, 0, 55);
     SDL_RenderClear(sdl_renderer_);
 
-    // Draw start
+    if (deck_ != nullptr) {
+        // Draw start
+        const Slide& slide = deck_->CurrentSlide();
+        //// Paint bg
+        const Color c = slide.color;
+        SDL_SetRenderDrawColor(sdl_renderer_, c.r, c.g, c.b, c.a);
+        SDL_RenderClear(sdl_renderer_);
+    }
+
+    //// Paint fps
 
     // Draw end
 

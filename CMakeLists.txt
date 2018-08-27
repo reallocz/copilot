@@ -8,6 +8,8 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 add_executable( debug 
     src/main.cc
     src/display.cc
+    src/slide.cc
+    src/deck.cc
 )
 
 target_link_libraries( debug

@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "SDL2/SDL.h"
+#include "deck.h"
 
 class Display
 {
@@ -12,6 +13,8 @@ private:
     unsigned int width_, height_;
     std::string title_;
 
+    Deck* deck_;
+
     // SDL stuff
     SDL_Window* sdl_window_;
     SDL_Renderer* sdl_renderer_;
@@ -20,6 +23,7 @@ public:
     Display(unsigned int width, unsigned int height);
     ~Display();
 
+    void SetDeck(Deck* deck);
     // Open up the window
     void Start();
     // Update every frame
