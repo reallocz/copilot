@@ -14,5 +14,6 @@ add_executable( debug
 
 target_link_libraries( debug
     SDL2
+    SDL2_ttf
     pthread
 )

@@ -1,5 +1,6 @@
 #pragma once
 #include "SDL2/SDL.h"
+#include "SDL2/SDL_ttf.h"
 #include "string.h"
 #include "slide.h"
 
@@ -14,6 +15,9 @@ struct window {
     // SDL stuff
     SDL_Window* sdl_window;
     SDL_Renderer* sdl_renderer;
+
+    // Font stuff
+    TTF_Font* font;
 };
 
 /**
