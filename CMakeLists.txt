@@ -7,6 +7,7 @@ add_compile_options(-Wall -Wextra -Wpedantic)
 # Executables
 add_executable( debug 
     src/string.c
+    src/font.c
     src/window.c
     src/slide.c
     src/main.c

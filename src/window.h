@@ -7,7 +7,7 @@
 struct window {
     int quit;    // 1 = quit, 0 = don't
     // Dimensions and title
-    unsigned int width, height;
+    int width, height;
     struct string title;
 
     struct deck* deck;
@@ -32,9 +32,15 @@ void win_destroy(struct window* win);
 // Open up the window
 int win_start(struct window* win);
 
+/**
+ * Updates window.width and window.height fields.
+ * Returns 1 if size was updated
+ */
+int win_update_size(struct window* win);
+
 // Set up a deck to persent
 void win_set_deck(struct window* win, struct deck* deck);
 
-// Update every frame
-void win_update(struct window* win);
+// Render current contents
+void win_render(const struct window* win);
 

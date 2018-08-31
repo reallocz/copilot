@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include "string.h"
 #include "window.h"
+#include "flags.h"
 
 
 // TODO
@@ -45,7 +46,8 @@ int main()
 
         // Update display
         if (should_render == 1) {
-            win_update(window);
+            win_update_size(window);
+            win_render(window);
             should_render = 0;
         }
     }
