@@ -9,11 +9,3 @@ struct color {
     unsigned char r, g, b, a;   // 0-255
 };
 
-
-/** Meta information about fonts */
-struct font {
-    int flags;
-    TTF_Font* ttf_font; // SDL_Ttf font pointer
-    int ptsize;
-};
-
