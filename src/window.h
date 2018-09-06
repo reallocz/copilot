@@ -6,7 +6,7 @@
 
 struct window {
     int quit;    // 1 = quit, 0 = don't
-    // Dimensions and title
+
     int width, height;
     struct string title;
 
@@ -22,24 +22,22 @@ struct window {
 
 /**
  * Create a new window with provided values
- * NOTE: call window_start to actually initialize sdl and open up
+ * NOTE: call window_show to actually initialize sdl and open up
  * a window.
  */
 struct window* win_new(unsigned int width, unsigned int height);
 
+/** Cleanup sdl, ttf etc */
 void win_destroy(struct window* win);
 
-// Open up the window
-int win_start(struct window* win);
+/** Init sdl, ttf and display the window */
+int win_show(struct window* win);
 
 /**
  * Updates window.width and window.height fields.
  * Returns 1 if size was updated
  */
 int win_update_size(struct window* win);
-
-// Set up a deck to persent
-void win_set_deck(struct window* win, struct deck* deck);
 
 // Render current contents
 void win_render(const struct window* win);

@@ -37,56 +37,58 @@ void win_destroy(struct window* win)
 }
 
 
-void win_set_deck(struct window* win, struct deck* deck)
+static int _init_sdl(struct window* win)
 {
-    printf("slide deck set!\n");
-    win->deck = deck;
+    int err;
+    err = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS |
+                   SDL_INIT_TIMER);
+    if (err != 0) {
+        printf("Error!!");
+        SDL_Log("Unable to init sdl: %s", SDL_GetError());
+        return 1;
+    }
+
+    // Create sdl_window
+    win->sdl_window =
+        SDL_CreateWindow(win->title.data, SDL_WINDOWPOS_UNDEFINED,
+                         SDL_WINDOWPOS_UNDEFINED, win->width, win->height, 0);
+    if (win->sdl_window == NULL) {
+        SDL_Log("Unable to create window: %s", SDL_GetError());
+        return 1;
+    }
+
+    // Create sdl_renderer
+    win->sdl_renderer = SDL_CreateRenderer(win->sdl_window, -1, 0);
+    if (win->sdl_renderer == NULL) {
+        SDL_Log("Unable to create renderer: %s", SDL_GetError());
+        return 1;
+    }
+
+    printf("sdl initialized successfully!\n");
+    return 0;
 }
 
-int win_start(struct window* win)
+static int _init_ttf(struct window* win)
 {
-    {    // SDL init
-        int err;
-        err = SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO | SDL_INIT_EVENTS |
-                       SDL_INIT_TIMER);
-        if (err != 0) {
-            printf("Error!!");
-            SDL_Log("Unable to init sdl: %s", SDL_GetError());
-            return 1;
-        }
-
-        // Create sdl_window
-        win->sdl_window = SDL_CreateWindow(
-            win->title.data, SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED,
-            win->width, win->height, 0);
-        if (win->sdl_window == NULL) {
-            SDL_Log("Unable to create window: %s", SDL_GetError());
-            return 1;
-        }
-
-        // Create sdl_renderer
-        win->sdl_renderer = SDL_CreateRenderer(win->sdl_window, -1, 0);
-        if (win->sdl_renderer == NULL) {
-            SDL_Log("Unable to create renderer: %s", SDL_GetError());
-            return 1;
-        }
-
-        printf("Display initialized successfully!\n");
+    if (TTF_Init() == -1) {
+        printf("TTF_Init error: %s\n", TTF_GetError());
+        return 1;
     }
-
-    {    // SDL_ttf init
-        if (TTF_Init() == -1) {
-            printf("TTF_Init error: %s\n", TTF_GetError());
-            return 1;
-        }
-        win->font = TTF_OpenFont(PDEF_FONT, 80);
-        if (win->font == NULL) {
-            printf("Failed to open font.ttf: %s\n", TTF_GetError());
-            return 1;
-        }
-        printf("Font loaded successfully!\n");
+    win->font = TTF_OpenFont(PDEF_FONT, 80);
+    if (win->font == NULL) {
+        printf("Failed to open font.ttf: %s\n", TTF_GetError());
+        return 1;
     }
+    printf("Font loaded successfully!\n");
     return 0;
+}
+
+int win_show(struct window* win)
+{
+    int err = 0;
+    err     = _init_sdl(win);
+    err     = _init_ttf(win);
+    return err;
 }
 
 int win_update_size(struct window* win)

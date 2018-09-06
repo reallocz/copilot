@@ -1,19 +1,23 @@
 #include <stdio.h>
-#include "string.h"
-#include "window.h"
 #include "flags.h"
+#include "string.h"
 #include "view/rect.h"
+#include "window.h"
 
+
+static const int window_width = 640, window_height = 480;
 
 struct deck demo_deck(void);
 
 int main()
 {
-    struct window* window = win_new(640, 480);
-    win_start(window);
+    struct window* window = win_new(window_width, window_height);
 
     struct deck deck = demo_deck();
     window->deck     = &deck;
+
+
+    win_show(window);
 
     // Main loop
     int should_render = 1;    // Render only on input!
@@ -23,9 +27,11 @@ int main()
 
         while (SDL_PollEvent(&sdl_event)) {
             switch (sdl_event.type) {
-            case SDL_QUIT: window->quit = 1; break;
+            case SDL_QUIT:
+                window->quit = 1;
+                break;
             case SDL_KEYUP: {
-                should_render = 1;
+                should_render     = 1;
                 SDL_Keysym keysym = sdl_event.key.keysym;
                 if (keysym.sym == SDLK_ESCAPE) {
                     window->quit = 1;
@@ -34,7 +40,9 @@ int main()
                         window->deck->pointer++;
                     }
                 } else if (keysym.sym == SDLK_LEFT) {
-                    if (window->deck->pointer > 0) { window->deck->pointer--; }
+                    if (window->deck->pointer > 0) {
+                        window->deck->pointer--;
+                    }
                 }
             }
             }
@@ -54,7 +62,7 @@ int main()
 
 // TODO make const
 const char* sample_strings[] = {"Slide 1", "This is slide 2",
-                          "Slide 3 on the house!"};
+                                "Slide 3 on the house!"};
 
 struct deck demo_deck(void)
 {
@@ -66,7 +74,7 @@ struct deck demo_deck(void)
         struct slide* slide = &deck.slides[i];
         slide->init         = 1;
         slide->color        = (struct color){i * 70, (i - 20) * 50, 0, 255};
-        slide->text = str_from(sample_strings[i]);
+        slide->text         = str_from(sample_strings[i]);
     }
     return deck;
 }
