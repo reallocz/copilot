@@ -22,9 +22,7 @@ struct window* win_new(unsigned int width, unsigned int height)
     win->font          = NULL;
 
     // Set title
-    struct string title = str_new(0);
-    str_set(&title, PDEF_TITLE);
-    win->title = title;
+    win->title = str_from(PDEF_TITLE);
     return win;
 }
 
@@ -187,10 +185,10 @@ void win_render(const struct window* win)
         SDL_SetRenderDrawColor(win->sdl_renderer, 0, 0, 0, 100);
         SDL_Rect snr;
         int xpadding = 6, ypadding = 1;
-        snr.w       = rects[SLIDENO].w + xpadding * 2;
-        snr.h       = rects[SLIDENO].h + ypadding * 2;
-        snr.x       = rects[SLIDENO].x - (xpadding);
-        snr.y       = rects[SLIDENO].y - (ypadding);
+        snr.w = rects[SLIDENO].w + xpadding * 2;
+        snr.h = rects[SLIDENO].h + ypadding * 2;
+        snr.x = rects[SLIDENO].x - (xpadding);
+        snr.y = rects[SLIDENO].y - (ypadding);
         SDL_SetRenderDrawBlendMode(win->sdl_renderer, SDL_BLENDMODE_BLEND);
         SDL_RenderFillRect(win->sdl_renderer, &snr);
         SDL_SetRenderDrawBlendMode(win->sdl_renderer, SDL_BLENDMODE_NONE);

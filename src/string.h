@@ -9,18 +9,20 @@ struct string {
     int len;    // Fixed length excluding '\0'
 };
 
-/**
- * Returns a mutable string of 'size' bytes.
- * If size is 0, size is set to default size.
- */
-struct string str_new(int size);
+/** Returns unallocated empty string */
+struct string str_empty(void);
+
 
 /** Free string */
 void str_free(struct string* str);
 
-/** Set value to string */
-void str_set(struct string* str, char* data);
+
+/** Create a new string from data. */
+struct string str_from(const char* data);
+
+
+/** Deletes current string and creates a new one from data */
+void str_set(struct string* str, const char* data);
 
 /** Debug string */
-void str_print(struct string* str);
-
+void str_debug(const struct string* str);

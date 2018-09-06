@@ -2,14 +2,10 @@
 #include "string.h"
 #include "window.h"
 #include "flags.h"
+#include "view/rect.h"
 
 
-// TODO
-// add sdl2ttf support
-// finalize source slide format
-// figure out custom layouts in a slide
-
-struct deck demo_deck();
+struct deck demo_deck(void);
 
 int main()
 {
@@ -56,10 +52,11 @@ int main()
 }
 
 
-char* sample_strings[] = {"Slide 1", "This is slide 2",
+// TODO make const
+const char* sample_strings[] = {"Slide 1", "This is slide 2",
                           "Slide 3 on the house!"};
 
-struct deck demo_deck()
+struct deck demo_deck(void)
 {
     struct deck deck;
     deck.slides      = malloc(3 * sizeof(struct slide));
@@ -69,8 +66,7 @@ struct deck demo_deck()
         struct slide* slide = &deck.slides[i];
         slide->init         = 1;
         slide->color        = (struct color){i * 70, (i - 20) * 50, 0, 255};
-        slide->text         = str_new(0);
-        str_set(&slide->text, sample_strings[i]);
+        slide->text = str_from(sample_strings[i]);
     }
     return deck;
 }
