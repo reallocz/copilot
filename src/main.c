@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "flags.h"
 #include "string.h"
-#include "view/rect.h"
+#include "view/view.h"
 #include "window.h"
 
 
@@ -60,21 +60,25 @@ int main()
 }
 
 
-// TODO make const
 const char* sample_strings[] = {"Slide 1", "This is slide 2",
                                 "Slide 3 on the house!"};
 
 struct deck demo_deck(void)
 {
-    struct deck deck;
-    deck.slides      = malloc(3 * sizeof(struct slide));
-    deck.slide_count = 3;
-    deck.pointer     = 0;
+    struct deck deck = dk_new(3);
+
     for (int i = 0; i < deck.slide_count; ++i) {
-        struct slide* slide = &deck.slides[i];
-        slide->init         = 1;
-        slide->color        = (struct color){i * 70, (i - 20) * 50, 0, 255};
-        slide->text         = str_from(sample_strings[i]);
+        struct slide* slide = &deck.slides[i];    // alias
+        struct textview* tv = malloc(sizeof(struct textview));
+
+        v_init(tv, TEXTVIEW);
+        tv->v.width     = window_width;
+        tv->v.height    = window_height;
+        tv->v.stl.fgcol = COL(0, 0, 0, 255);
+        tv->v.stl.bgcol = (struct color){255 - i * 80, 0, 0, 255};
+        tv->str         = str_from(sample_strings[i]);
+
+        slide->view = tv;
     }
     return deck;
 }

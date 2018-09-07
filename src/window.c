@@ -1,5 +1,7 @@
 #include "window.h"
 #include <assert.h>
+#include "renderer.h"
+#include "view/style.h"
 
 #define PDEF_TITLE "Untitled Window"
 #define PDEF_FONT "font.ttf"
@@ -88,6 +90,8 @@ int win_show(struct window* win)
     int err = 0;
     err     = _init_sdl(win);
     err     = _init_ttf(win);
+    r_init(win->sdl_renderer);
+    r_setfont(win->font);
     return err;
 }
 
@@ -113,100 +117,47 @@ void win_render(const struct window* win)
     const int scrwidth  = win->width;
     const int scrheight = win->height;
 
-    // Clear screen in black
-    SDL_SetRenderDrawColor(win->sdl_renderer, 0, 0, 0, 255);
-    SDL_RenderClear(win->sdl_renderer);
+    r_clearscreen();
 
-    // !! Drawing start !!
-    SDL_Rect rects[TOTAL];
-    SDL_Surface* surfs[TOTAL];
-    SDL_Texture* textures[TOTAL];
-
-    // Draw slide
-    {
-        /*printf("Rendering: %s\n", slide->text.data);*/
-
+    {    // Draw slide
+        r_setbounds((struct rect){0, 0, scrwidth, scrheight / 3});
         const struct slide* slide = &win->deck->slides[win->deck->pointer];
-        const struct color bgcol  = slide->color;
-
         // Paint bg
-        SDL_SetRenderDrawColor(win->sdl_renderer, bgcol.r, bgcol.g, bgcol.b,
-                               bgcol.a);
-        SDL_RenderClear(win->sdl_renderer);
-
-        // Render text
-        SDL_Color txtcol = {255, 255, 255, 255};    // White
-
-        surfs[SLIDE] =
-            TTF_RenderText_Solid(win->font, slide->text.data, txtcol);
-        textures[SLIDE] =
-            SDL_CreateTextureFromSurface(win->sdl_renderer, surfs[SLIDE]);
-
-        // Calculate text location(currently at the middle of the screen)
-        SDL_Rect* r = &rects[SLIDE];
-        r->h        = surfs[SLIDE]->h;
-        r->w        = surfs[SLIDE]->w;
-        r->x        = (scrwidth - r->w) / 2;
-        r->y        = (scrheight - r->h) / 2;
+        struct view* v = (struct view*) slide->view;
+        r_setcolor(COLWHITE);
+        r_clear();
+        // Draw slide contents
+        r_drawview(slide->view);
     }
+
+
 
     // Draw slide number at centre of bottom edge.
     {
 
-        SDL_Color txtcol = {255, 255, 255, 255};    // White
+        char* format = "%d-%d";    // Slide '02/24'
+        char buffer[7];            // Max 7 chars '999/999'
 
-        char* format = "%d-%d";                  // Slide '02/24'
-        char buffer[7];                          // Max 7 chars '999/999'
         int slideno = win->deck->pointer + 1;    // 1 indexed
         snprintf(buffer, 7, format, slideno, win->deck->slide_count);
-        surfs[SLIDENO] = TTF_RenderText_Solid(win->font, buffer, txtcol);
-        textures[SLIDENO] =
-            SDL_CreateTextureFromSurface(win->sdl_renderer, surfs[SLIDENO]);
 
+        struct textview tv;
+        v_init(&tv, TEXTVIEW);
+        tv.str         = str_from(buffer);
+        tv.v.stl.fgcol = COL(0, 0, 0, 255);
 
+        struct rect bnd;
+        bnd.h = scrheight / 10;
+        bnd.w = scrwidth / 10;
+        bnd.y = scrheight - bnd.h;
+        bnd.x = (scrwidth - bnd.w) / 2;
 
-        // Claculate text location (100px * 50px)
-        SDL_Rect* r = &rects[SLIDENO];
-        r->h        = surfs[SLIDENO]->h / 3;    // Currently scaled down by 3
-        r->w        = surfs[SLIDENO]->w / 3;
-        r->x        = (scrwidth - r->w) / 2;
-        r->y        = (scrheight - r->h) - 5;    // 5 padding at the bottom
+        r_setbounds(bnd);
+        r_setcolor(COLRED);
+        r_drawview(&tv);
     }
 
-
-
-    // !! Drawing end !!
-
-
-    // Render copy to the screen
-    {
-        // render slide text
-        SDL_RenderCopy(win->sdl_renderer, textures[SLIDE], NULL, &rects[SLIDE]);
-
-        // render slide number bg box
-        SDL_SetRenderDrawColor(win->sdl_renderer, 0, 0, 0, 100);
-        SDL_Rect snr;
-        int xpadding = 6, ypadding = 1;
-        snr.w = rects[SLIDENO].w + xpadding * 2;
-        snr.h = rects[SLIDENO].h + ypadding * 2;
-        snr.x = rects[SLIDENO].x - (xpadding);
-        snr.y = rects[SLIDENO].y - (ypadding);
-        SDL_SetRenderDrawBlendMode(win->sdl_renderer, SDL_BLENDMODE_BLEND);
-        SDL_RenderFillRect(win->sdl_renderer, &snr);
-        SDL_SetRenderDrawBlendMode(win->sdl_renderer, SDL_BLENDMODE_NONE);
-        // render slide no
-        SDL_RenderCopy(win->sdl_renderer, textures[SLIDENO], NULL,
-                       &rects[SLIDENO]);
-    }
-
-    // Free all created textures and surfaces
-    {
-        SDL_FreeSurface(surfs[SLIDE]);
-        SDL_FreeSurface(surfs[SLIDENO]);
-        SDL_DestroyTexture(textures[SLIDE]);
-        SDL_DestroyTexture(textures[SLIDENO]);
-    }
 
     // Update!
-    SDL_RenderPresent(win->sdl_renderer);
+    _r_render();
 }
